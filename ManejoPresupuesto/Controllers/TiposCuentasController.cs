@@ -14,6 +14,11 @@ namespace ManejoPresupuesto.Controllers
         [HttpPost]
         public IActionResult Crear(TipoCuenta tipoCuenta)
         {
+            //Si el modelo no es valido lo enviamos de nuevo al formulario
+            if (!ModelState.IsValid)
+            {
+                return View(tipoCuenta);
+            }
             return View();
         }
     }
