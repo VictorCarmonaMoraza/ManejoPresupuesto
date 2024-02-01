@@ -8,6 +8,8 @@ namespace ManejoPresupuesto.Controllers
 
         public IActionResult Crear()
         {
+            //var modelo = new TipoCuenta() { Nombre = "pedro" };
+            //return View(modelo);
             return View();
         }
 
