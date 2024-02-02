@@ -7,12 +7,12 @@ namespace ManejoPresupuesto.Servicios
     //INTERFACE
     public interface IRepositorioTiposCuentas
     {
-        void Crear(TipoCuenta tipoCuenta);
+        Task Crear(TipoCuenta tipoCuenta);
     }
 
 
     //REPOSITORIO
-    public class RepositorioTiposCuentas: IRepositorioTiposCuentas
+    public class RepositorioTiposCuentas : IRepositorioTiposCuentas
     {
 
         private readonly string connectionString;
@@ -21,13 +21,23 @@ namespace ManejoPresupuesto.Servicios
             connectionString = configuration.GetConnectionString("RutaServerSQL");
         }
 
-        public void Crear(TipoCuenta tipoCuenta)
+        public async Task Crear(TipoCuenta tipoCuenta)
         {
             using var connection = new SqlConnection(connectionString);
+
+            //Asegurarnos que la conexion esta abierta antes de ejecutar la query
+            await connection.OpenAsync();
+
             //Hacer un query que solo trae un resultado
-            var id = connection.QuerySingle<int>($@"insert into TiposCuentas (Nombre,UsuarioId,Orden) Values(@Nombre,@UsuarioId,0);
-                                SELECT SCOPE_IDENTITY();",tipoCuenta);
-            tipoCuenta.Id = id;
+            //var id =await connection.QuerySingleAsync<int>($@"insert into TiposCuentas (Nombre,UsuarioId,Orden) Values(@Nombre,@UsuarioId,0);
+            //                    SELECT SCOPE_IDENTITY();",tipoCuenta);
+
+            var id = await connection.QuerySingleAsync<int>(
+                        @"INSERT INTO TiposCuentas (Nombre, UsuarioId, Orden) VALUES (@Nombre, @UsuarioId, 0);
+                        SELECT SCOPE_IDENTITY();",
+                        new { tipoCuenta.Nombre, tipoCuenta.UsuarioId });
+
+                        tipoCuenta.Id = id;
         }
     }
 }

@@ -22,7 +22,7 @@ namespace ManejoPresupuesto.Controllers
         }
 
         [HttpPost]
-        public IActionResult Crear(TipoCuenta tipoCuenta)
+        public async Task<IActionResult> Crear(TipoCuenta tipoCuenta)
         {
             //Si el modelo no es valido lo enviamos de nuevo al formulario
             if (!ModelState.IsValid)
@@ -32,9 +32,21 @@ namespace ManejoPresupuesto.Controllers
 
             tipoCuenta.UsuarioId = 1;
 
-            _resitorioTiposCuentas.Crear(tipoCuenta);
+            try
+            {
+                await _resitorioTiposCuentas.Crear(tipoCuenta);
+                //var nuevoTipoCuenta = new TipoCuenta();
+                //return View(nuevoTipoCuenta);
+                return View();
+            }
+            catch (Exception ex)
+            {
 
-            return View();
+                // Manejo de la excepción, posiblemente registrándola y mostrando un mensaje al usuario
+                ModelState.AddModelError(string.Empty, "Ocurrió un error al crear el tipo de cuenta.");
+                return View(tipoCuenta);
+            }
+            
         }
     }
 }
