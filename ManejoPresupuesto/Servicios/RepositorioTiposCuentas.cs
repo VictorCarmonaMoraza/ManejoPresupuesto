@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using ManejoPresupuesto.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.Identity.Client;
 
 namespace ManejoPresupuesto.Servicios
 {
@@ -8,6 +9,8 @@ namespace ManejoPresupuesto.Servicios
     public interface IRepositorioTiposCuentas
     {
         Task Crear(TipoCuenta tipoCuenta);
+
+        Task<bool> Existe(string nombre, int usuarioId);
     }
 
 
@@ -20,7 +23,11 @@ namespace ManejoPresupuesto.Servicios
         {
             connectionString = configuration.GetConnectionString("RutaServerSQL");
         }
-
+        /// <summary>
+        /// Crear un tipo de Cuenta
+        /// </summary>
+        /// <param name="tipoCuenta">model tipocuenta</param>
+        /// <returns></returns>
         public async Task Crear(TipoCuenta tipoCuenta)
         {
             using var connection = new SqlConnection(connectionString);
@@ -38,6 +45,34 @@ namespace ManejoPresupuesto.Servicios
                         new { tipoCuenta.Nombre, tipoCuenta.UsuarioId });
 
                         tipoCuenta.Id = id;
+        }
+
+        /// <summary>
+        /// Validacion si un usuario ya existe
+        /// </summary>
+        /// <param name="nombre">nombre</param>
+        /// <param name="usuarioId">Id del usuario</param>
+        /// <returns></returns>
+        public async Task<bool> Existe(string nombre, int usuarioId)
+        {
+
+            using var connection = new SqlConnection(connectionString);
+
+            //Asegurarnos que la conexion esta abierta antes de ejecutar la query
+            await connection.OpenAsync();
+            //Opcion 1            
+            var existe = await connection.QueryFirstOrDefaultAsync<int>(@$"select 1 from TiposCuentas where Nombre=@Nombre and UsuarioId =@UsuarioId;",
+                new {nombre,usuarioId});
+
+            //Opcion 2
+            //var parametros  = new { Nombre = nombre, UsuarioId = usuarioId };
+            //var existe = await connection.QueryFirstOrDefaultAsync<int>(
+            //            @"SELECT 1 FROM TiposCuentas WHERE Nombre=@Nombre AND UsuarioId=@UsuarioId;",
+            //            parametros);
+
+            bool registroExiste = existe == 1;
+
+            return registroExiste;
         }
     }
 }

@@ -34,6 +34,15 @@ namespace ManejoPresupuesto.Controllers
 
             try
             {
+                //Comprobamos que la data existe de la siguiente
+                bool yaExisteTipoCuenta = await _resitorioTiposCuentas.Existe(tipoCuenta.Nombre, tipoCuenta.UsuarioId);
+
+                if (yaExisteTipoCuenta)
+                {
+                    ModelState.AddModelError(nameof(tipoCuenta.Nombre), $"El nombre {tipoCuenta.Nombre} ya existe");
+                    return View(tipoCuenta);
+                }
+
                 await _resitorioTiposCuentas.Crear(tipoCuenta);
                 //var nuevoTipoCuenta = new TipoCuenta();
                 //return View(nuevoTipoCuenta);
@@ -42,11 +51,10 @@ namespace ManejoPresupuesto.Controllers
             catch (Exception ex)
             {
 
-                // Manejo de la excepción, posiblemente registrándola y mostrando un mensaje al usuario
+                // Manejo de la excepción, posiblemente registrándola y mostrando un ensaje al usuario
                 ModelState.AddModelError(string.Empty, "Ocurrió un error al crear el tipo de cuenta.");
                 return View(tipoCuenta);
             }
-            
         }
-    }
+    } 
 }
