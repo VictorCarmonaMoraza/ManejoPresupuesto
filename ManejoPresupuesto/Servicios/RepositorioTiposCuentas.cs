@@ -15,6 +15,10 @@ namespace ManejoPresupuesto.Servicios
         Task <IEnumerable<TipoCuenta>> Listar();
 
         Task <IEnumerable<TipoCuenta>> ListarPorUsuarioId(int usuarioId);
+
+        Task Actualizar(TipoCuenta tipoCuenta);
+
+        Task<TipoCuenta> ObtenerPorId(int id, int usuarioId);
     }
 
 
@@ -112,6 +116,26 @@ namespace ManejoPresupuesto.Servicios
                                new { usuarioId });
 
             return lista;
+        }
+
+        public async Task Actualizar(TipoCuenta tipoCuenta)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            //Asegurarnos que la conexion esta abierta antes de ejecutar la query
+            await connection.OpenAsync();
+
+            await connection.ExecuteAsync(@"UPDATE TiposCuentas SET Nombre=@Nombre WHERE Id=@Id;",
+                               new { tipoCuenta.Nombre, tipoCuenta.Id });
+        }
+
+        public async Task<TipoCuenta> ObtenerPorId(int id, int usuarioId)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            await connection.OpenAsync();
+            return await connection.QueryFirstOrDefaultAsync<TipoCuenta>(@"SELECT * FROM TiposCuentas WHERE Id=@id AND UsuarioId=@usuarioId;",
+                               new { id, usuarioId });
         }
     }
 }

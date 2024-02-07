@@ -1,5 +1,6 @@
 ﻿using ManejoPresupuesto.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 using System.Diagnostics;
 
 namespace ManejoPresupuesto.Controllers
@@ -19,6 +20,11 @@ namespace ManejoPresupuesto.Controllers
         }
 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult NoEncontrado()
         {
             return View();
         }
