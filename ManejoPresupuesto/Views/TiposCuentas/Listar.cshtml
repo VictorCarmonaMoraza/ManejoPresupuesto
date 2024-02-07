@@ -1,0 +1,30 @@
+﻿@model IEnumerable<TipoCuenta>
+
+<h2>Listar Tipos de Cuentas</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
+                <td>@Html.DisplayFor(modelItem => item.UsuarioId)</td>
+                <td>@Html.DisplayFor(modelItem => item.Orden)</td>
+                <td>
+                    @Html.ActionLink("Editar", "Editar", new { id = item.Id }) |
+                    @Html.ActionLink("Detalles", "Detalles", new { id = item.Id }) |
+                    @Html.ActionLink("Eliminar", "Eliminar", new { id = item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

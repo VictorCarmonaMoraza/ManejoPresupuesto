@@ -47,7 +47,7 @@ namespace ManejoPresupuesto.Controllers
                 await _resitorioTiposCuentas.Crear(tipoCuenta);
                 //var nuevoTipoCuenta = new TipoCuenta();
                 //return View(nuevoTipoCuenta);
-                return View();
+                return RedirectToAction("ListarPorUsuarioId");
             }
             catch (Exception ex)
             {
@@ -69,6 +69,30 @@ namespace ManejoPresupuesto.Controllers
                 return Json($"El nombre {nombre} ya existe");
             }
             return Json(true);
+        }
+
+        /// <summary>
+        /// Lista todos los tipos de cuentas
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> Listar()
+        {
+            //var usuarioId = 1;
+            var tiposCuentas = await _resitorioTiposCuentas.Listar();
+            return View(tiposCuentas);
+        }
+
+        /// <summary>
+        /// Lista de tipo de cuenta por usuario id 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> ListarPorUsuarioId()
+        {
+            int usuarioId = 1;
+            var tiposCuentas = await _resitorioTiposCuentas.ListarPorUsuarioId(usuarioId);
+            return View(tiposCuentas);
         }
     } 
 }

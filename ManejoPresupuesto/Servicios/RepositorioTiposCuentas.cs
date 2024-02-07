@@ -11,6 +11,10 @@ namespace ManejoPresupuesto.Servicios
         Task Crear(TipoCuenta tipoCuenta);
 
         Task<bool> Existe(string nombre, int usuarioId);
+
+        Task <IEnumerable<TipoCuenta>> Listar();
+
+        Task <IEnumerable<TipoCuenta>> ListarPorUsuarioId(int usuarioId);
     }
 
 
@@ -73,6 +77,41 @@ namespace ManejoPresupuesto.Servicios
             bool registroExiste = existe == 1;
 
             return registroExiste;
+        }
+
+        /// <summary>
+        /// Listar todos los tipos de cuentas
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<TipoCuenta>> Listar()
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            //Asegurarnos que la conexion esta abierta antes de ejecutar la query
+            await connection.OpenAsync();
+
+            var lista = await connection.QueryAsync<TipoCuenta>(@"SELECT * FROM TiposCuentas;");
+
+            return lista;
+        }
+
+
+        /// <summary>
+        /// Lista tipos de cuentas por usuario id
+        /// </summary>
+        /// <param name="usuarioId">usuario id</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TipoCuenta>> ListarPorUsuarioId(int usuarioId)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            //Asegurarnos que la conexion esta abierta antes de ejecutar la query
+            await connection.OpenAsync();
+
+            var lista = await connection.QueryAsync<TipoCuenta>(@"SELECT * FROM TiposCuentas WHERE UsuarioId=@usuarioId;",
+                               new { usuarioId });
+
+            return lista;
         }
     }
 }

@@ -1,0 +1,30 @@
+﻿@model IEnumerable<TipoCuenta>
+@{
+    ViewData["Title"] = "Listar por Usuario Id";
+
+}
+
+<h1>Tipos de cuentas</h1>
+
+<a asp-action="Crear" class="btn-btn-primary">Crear Nuevo</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tipoCuenta in Model)
+        {
+            <tr>
+                <td>
+                    <a class="btn btn-primary">Editar </a>
+                    <a class="btn btn-danger">Borrar </a>
+                </td>
+                <td>
+                    @tipoCuenta.Nombre
+                </td>
+            </tr>
+        }
+    </tbody>
