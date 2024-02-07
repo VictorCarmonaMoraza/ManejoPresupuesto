@@ -2,6 +2,7 @@
 using ManejoPresupuesto.Models;
 using ManejoPresupuesto.Servicios;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Data.SqlClient;
 
 namespace ManejoPresupuesto.Controllers
@@ -55,6 +56,19 @@ namespace ManejoPresupuesto.Controllers
                 ModelState.AddModelError(string.Empty, "Ocurrió un error al crear el tipo de cuenta.");
                 return View(tipoCuenta);
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VerificarExisteTipoCuenta(string nombre)
+        {
+            var usuarioId = 1;
+            var yaExisteTipoCuenta = await _resitorioTiposCuentas.Existe(nombre, usuarioId);
+
+            if (yaExisteTipoCuenta)
+            {
+                return Json($"El nombre {nombre} ya existe");
+            }
+            return Json(true);
         }
     } 
 }
