@@ -19,6 +19,8 @@ namespace ManejoPresupuesto.Servicios
         Task Actualizar(TipoCuenta tipoCuenta);
 
         Task<TipoCuenta> ObtenerPorId(int id, int usuarioId);
+
+        Task Eliminar(int id);
     }
 
 
@@ -137,5 +139,14 @@ namespace ManejoPresupuesto.Servicios
             return await connection.QueryFirstOrDefaultAsync<TipoCuenta>(@"SELECT * FROM TiposCuentas WHERE Id=@id AND UsuarioId=@usuarioId;",
                                new { id, usuarioId });
         }
+
+        public async Task Eliminar(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            await connection.OpenAsync();
+            await connection.ExecuteAsync(@"DELETE FROM TiposCuentas WHERE Id=@id;",
+                                              new { id });
+        }   
     }
 }

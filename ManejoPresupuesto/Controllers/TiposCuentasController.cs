@@ -73,7 +73,7 @@ namespace ManejoPresupuesto.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Editar(TipoCuenta tipoCuenta)
+        public async Task<IActionResult> EditarTipoCuenta(TipoCuenta tipoCuenta)
         {
             //Obtenemos el id del usuario
             var usuarioId = _serviciosUsuarios.ObtenerUsuarioId();
@@ -83,11 +83,12 @@ namespace ManejoPresupuesto.Controllers
 
             if (tipoCuentaExiste == null)
             {
-                return RedirectToAction("No encontrado", "Home");
+                return RedirectToAction("NoEncontrado", "Home");
             }
             await _resitorioTiposCuentas.Actualizar(tipoCuenta);
             return RedirectToAction("ListarPorUsuarioId");
         }
+
         [HttpGet]
         public async Task<IActionResult> VerificarExisteTipoCuenta(string nombre)
         {
@@ -123,6 +124,49 @@ namespace ManejoPresupuesto.Controllers
             int usuarioId = _serviciosUsuarios.ObtenerUsuarioId();
             var tiposCuentas = await _resitorioTiposCuentas.ListarPorUsuarioId(usuarioId);
             return View(tiposCuentas);
+        }
+
+        /// <summary>
+        /// Elimina un tipo de cuenta
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var usuarioId = _serviciosUsuarios.ObtenerUsuarioId();
+            if (usuarioId == null)
+            {
+                return NotFound("Usuario no encontrado");
+            }
+
+            var tipoCuenta = await _resitorioTiposCuentas.ObtenerPorId(id, usuarioId);
+            if (tipoCuenta is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+           
+            //await _resitorioTiposCuentas.Eliminar(id);
+            return View(tipoCuenta);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EliminarPorId(TipoCuenta tipoCuenta)
+        {
+            var usuarioId = _serviciosUsuarios.ObtenerUsuarioId();
+            if (usuarioId == null)
+            {
+                return NotFound("Usuario no encontrado");
+            }
+
+            var tipoCuentaExiste = await _resitorioTiposCuentas.ObtenerPorId(tipoCuenta.Id, usuarioId);
+            if (tipoCuentaExiste == null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            await _resitorioTiposCuentas.Eliminar(tipoCuenta.Id);
+            return RedirectToAction("ListarPorUsuarioId");
         }
     } 
 }
