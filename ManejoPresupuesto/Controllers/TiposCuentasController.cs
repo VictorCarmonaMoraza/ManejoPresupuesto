@@ -168,5 +168,16 @@ namespace ManejoPresupuesto.Controllers
             await _resitorioTiposCuentas.Eliminar(tipoCuenta.Id);
             return RedirectToAction("ListarPorUsuarioId");
         }
+
+        /// <summary>
+        /// Ordenar la tabla por ids por ordenar la tabla a nuestro gusto
+        /// </summary>
+        /// <param name="ids">ids de los elementos</param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> OrdenarTabla([FromBody] int[] ids)
+        {
+            return Ok();
+        }
     } 
 }
