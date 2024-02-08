@@ -145,7 +145,7 @@ namespace ManejoPresupuesto.Controllers
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
-           
+
             //await _resitorioTiposCuentas.Eliminar(id);
             return View(tipoCuenta);
         }
@@ -170,14 +170,63 @@ namespace ManejoPresupuesto.Controllers
         }
 
         /// <summary>
-        /// Ordenar la tabla por ids por ordenar la tabla a nuestro gusto
+        /// OrdenarForma1 la tabla por ids por ordenar la tabla a nuestro gusto
         /// </summary>
         /// <param name="ids">ids de los elementos</param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> OrdenarTabla([FromBody] int[] ids)
+        public async Task<IActionResult> OrdenarTablaForma1([FromBody] int[] ids)
         {
+            int usuarioId = _serviciosUsuarios.ObtenerUsuarioId();
+
+            await _resitorioTiposCuentas.OrdenarForma1(usuarioId, ids);
+
             return Ok();
         }
-    } 
+
+
+        /// <summary>
+        /// OrdenarForma1 la tabla por ids por ordenar la tabla a nuestro gusto
+        /// </summary>
+        /// <param name="ids">ids de los elementos</param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> OrdenarTablaForma2([FromBody] int[] ids)
+        {
+            int usuarioId = _serviciosUsuarios.ObtenerUsuarioId();
+
+            //Obtiene los tipos cuentas por usuarioId
+            var tiposCuentas = await _resitorioTiposCuentas.ListarPorUsuarioId(usuarioId);
+            //Obtenemos los id de los tiposCuentas obtenidos
+            var idsTiposCuentas = tiposCuentas.Select(x => x.Id);
+
+            var idsTiposCuentasNoPertenecenAlUsuario = ids.Except(idsTiposCuentas).ToList();
+
+            if (idsTiposCuentasNoPertenecenAlUsuario.Count > 0)
+            {
+                //return BadRequest("Los ids no pertenecen al usuario");
+                return Forbid();
+            }
+
+            //var tiposCuentasOrdenados = ids.Select((valor, indice) =>
+            //            new TipoCuenta()
+            //            {
+            //                Id = valor,
+            //                Orden = indice,
+            //                Nombre = tiposCuentas.First(x => x.Id == valor).Nombre
+            //            }).AsEnumerable();
+
+            var tiposCuentasOrdenados = ids.Select((valor, indice) =>
+            new TipoCuenta()
+            {
+                Id = valor,
+                Orden = indice,
+                Nombre = tiposCuentas.First(x => x.Id == valor).Nombre
+            }).AsEnumerable();
+
+            await _resitorioTiposCuentas.OrdenarForma2(tiposCuentasOrdenados);
+
+            return Ok();
+        }
+    }
 }
