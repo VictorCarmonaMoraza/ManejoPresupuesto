@@ -48,14 +48,10 @@ namespace ManejoPresupuesto.Servicios
             //Asegurarnos que la conexion esta abierta antes de ejecutar la query
             await connection.OpenAsync();
 
-            //Hacer un query que solo trae un resultado
-            //var id =await connection.QuerySingleAsync<int>($@"insert into TiposCuentas (Nombre,UsuarioId,Orden) Values(@Nombre,@UsuarioId,0);
-            //                    SELECT SCOPE_IDENTITY();",tipoCuenta);
-
             var id = await connection.QuerySingleAsync<int>(
-                        @"INSERT INTO TiposCuentas (Nombre, UsuarioId, Orden) VALUES (@Nombre, @UsuarioId, 0);
-                        SELECT SCOPE_IDENTITY();",
-                        new { tipoCuenta.Nombre, tipoCuenta.UsuarioId });
+                        "TiposCuentas_Insertar",
+                        new {nombre= tipoCuenta.Nombre, usuarioId=tipoCuenta.UsuarioId },
+                        commandType:System.Data.CommandType.StoredProcedure);
 
                         tipoCuenta.Id = id;
         }
