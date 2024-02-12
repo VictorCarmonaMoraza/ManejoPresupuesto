@@ -37,6 +37,11 @@ namespace ManejoPresupuesto.Models
         /// Descripción opcional de la cuenta.
         /// </summary>
         public string Descripcion { get; set; }
+
+        /// <summary>
+        /// Tipo de cuenta asociado a esta cuenta.
+        /// </summary>
+        public string TipoCuenta { get; set; }
     }
 
 }
