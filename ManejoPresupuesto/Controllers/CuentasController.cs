@@ -2,6 +2,7 @@
 using ManejoPresupuesto.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Reflection;
 
 namespace ManejoPresupuesto.Controllers
 {
@@ -12,16 +13,18 @@ namespace ManejoPresupuesto.Controllers
     {
         private readonly IRepositorioTiposCuentas _repositorioTiposCuentas;
         private readonly IServicioUsuarios _servicioUsuarios;
+        private readonly IRepositorioCuentas _repositorioCuentas;
 
         /// <summary>
         /// Inicializa una nueva instancia del controlador CuentasController.
         /// </summary>
         /// <param name="repositorioTiposCuentas">Repositorio para operaciones relacionadas con los tipos de cuentas.</param>
         /// <param name="servicioUsuarios">Servicio para obtener información y operaciones relacionadas con los usuarios.</param>
-        public CuentasController(IRepositorioTiposCuentas repositorioTiposCuentas, IServicioUsuarios servicioUsuarios)
+        public CuentasController(IRepositorioTiposCuentas repositorioTiposCuentas, IServicioUsuarios servicioUsuarios, IRepositorioCuentas repositorioCuentas)
         {
             _repositorioTiposCuentas = repositorioTiposCuentas;
             _servicioUsuarios = servicioUsuarios;
+            _repositorioCuentas = repositorioCuentas;
         }
 
         /// <summary>
@@ -34,13 +37,44 @@ namespace ManejoPresupuesto.Controllers
         [HttpGet]
         public async Task<IActionResult> Crear()
         {
+            
             var usuarioId = _servicioUsuarios.ObtenerUsuarioId();
             var tiposCuentas = await _repositorioTiposCuentas.ListarPorUsuarioId(usuarioId);
             var modelo = new CuentaCreacionViewModel();
 
-            modelo.TiposCuentas = tiposCuentas.Select(x => new SelectListItem(x.Nombre, x.Id.ToString()));
+            modelo.TiposCuentas = await ObtenerTiposCuentas(usuarioId);
 
             return View(modelo);
+        }
+
+        //Cera una cuenta
+        [HttpPost]
+        public async Task<IActionResult> Crear(CuentaCreacionViewModel cuenta)
+        {
+
+            var usuarioId = _servicioUsuarios.ObtenerUsuarioId();
+
+            var tiposCuenta = await _repositorioTiposCuentas.ObtenerPorId(cuenta.TipoCuentaId,usuarioId);
+
+            if (tiposCuenta is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+
+            if (!ModelState.IsValid)
+            {
+                cuenta.TiposCuentas = await ObtenerTiposCuentas(usuarioId);
+                return View(cuenta);
+            }
+            await _repositorioCuentas.Crear(cuenta);
+            return RedirectToAction("Index");
+        }
+
+        private async Task<IEnumerable<SelectListItem>> ObtenerTiposCuentas(int usuarioId)
+        {
+            var tiposCuentas = await _repositorioTiposCuentas.ListarPorUsuarioId(usuarioId);
+            return tiposCuentas.Select(x => new SelectListItem(x.Nombre, x.Id.ToString()));
         }
     }
 }
