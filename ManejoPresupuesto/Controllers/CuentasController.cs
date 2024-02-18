@@ -1,4 +1,5 @@
-﻿using ManejoPresupuesto.Models;
+﻿using AutoMapper;
+using ManejoPresupuesto.Models;
 using ManejoPresupuesto.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,17 +15,19 @@ namespace ManejoPresupuesto.Controllers
         private readonly IRepositorioTiposCuentas _repositorioTiposCuentas;
         private readonly IServicioUsuarios _servicioUsuarios;
         private readonly IRepositorioCuentas _repositorioCuentas;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Inicializa una nueva instancia del controlador CuentasController.
         /// </summary>
         /// <param name="repositorioTiposCuentas">Repositorio para operaciones relacionadas con los tipos de cuentas.</param>
         /// <param name="servicioUsuarios">Servicio para obtener información y operaciones relacionadas con los usuarios.</param>
-        public CuentasController(IRepositorioTiposCuentas repositorioTiposCuentas, IServicioUsuarios servicioUsuarios, IRepositorioCuentas repositorioCuentas)
+        public CuentasController(IRepositorioTiposCuentas repositorioTiposCuentas, IServicioUsuarios servicioUsuarios, IRepositorioCuentas repositorioCuentas, IMapper mapper)
         {
             _repositorioTiposCuentas = repositorioTiposCuentas;
             _servicioUsuarios = servicioUsuarios;
             _repositorioCuentas = repositorioCuentas;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -126,14 +129,15 @@ namespace ManejoPresupuesto.Controllers
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
-            var modelo = new CuentaCreacionViewModel()
-            {
-             Id = cuenta.Id,
-             Nombre = cuenta.Nombre,
-             Descripcion = cuenta.Descripcion,
-             Balance = cuenta.Balance,
-             TipoCuentaId = cuenta.TipoCuentaId
-            };
+            //var modelo = new CuentaCreacionViewModel()
+            //{
+            // Id = cuenta.Id,
+            // Nombre = cuenta.Nombre,
+            // Descripcion = cuenta.Descripcion,
+            // Balance = cuenta.Balance,
+            // TipoCuentaId = cuenta.TipoCuentaId
+            //};
+            var modelo = _mapper.Map<CuentaCreacionViewModel>(cuenta);
 
             modelo.TiposCuentas = await ObtenerTiposCuentas(usuarioId);
 
