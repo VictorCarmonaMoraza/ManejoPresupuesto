@@ -7,8 +7,10 @@ namespace ManejoPresupuesto.Servicios
 
     public interface IRepositorioCuentas
     {
+        Task Actualizar(CuentaCreacionViewModel cuenta);
         Task<IEnumerable<Cuenta>> Buscar(int usuarioId);
         Task Crear(Cuenta cuenta);
+        Task<Cuenta> ObtenerPorId(int id, int usuarioId);
     }
     public class RepositorioCuentas: IRepositorioCuentas
     {
@@ -53,6 +55,28 @@ namespace ManejoPresupuesto.Servicios
                                             where tc.UsuarioId =@UsuarioId
                                             order by tc.Orden", new {usuarioId});
             return cuentas;
+        }
+
+        public async Task<Cuenta> ObtenerPorId(int id, int usuarioId)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            return await connection.QueryFirstOrDefaultAsync<Cuenta>(@"Select a.Id,a.Nombre,a.Balance,a.Descripcion,a.TipoCuentaId
+                                                                        From Cuentas a
+                                                                        inner join  TiposCuentas b
+                                                                        on b.Id = a.TipoCuentaId
+                                                                        where b.UsuarioId = @UsuarioId and a.Id = @Id", new {id, usuarioId});
+        }
+
+        public async Task Actualizar(CuentaCreacionViewModel cuenta)
+        {
+            using var connection = new SqlConnection(connectionString);
+            //await connection.ExecuteAsync(@"update Cuentas set Nombre = @Nombre, Balance = @Balance, Descripcion = @Descripcion
+            //                                TipoCuentaId = @TipoCuentaId
+            //                                where Id = @Id", cuenta);
+            await connection.ExecuteAsync(@"update Cuentas set Nombre = @Nombre, Balance = @Balance, Descripcion = @Descripcion,
+                                    TipoCuentaId = @TipoCuentaId
+                                    where Id = @Id", cuenta);
         }
     }
 }

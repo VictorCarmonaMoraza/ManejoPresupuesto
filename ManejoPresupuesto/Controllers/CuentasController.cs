@@ -114,5 +114,53 @@ namespace ManejoPresupuesto.Controllers
             var tiposCuentas = await _repositorioTiposCuentas.ListarPorUsuarioId(usuarioId);
             return tiposCuentas.Select(x => new SelectListItem(x.Nombre, x.Id.ToString()));
         }
+
+        //Metodo para editar una cuenta
+        public async Task<IActionResult> Editar(int id)
+        {
+            var usuarioId = _servicioUsuarios.ObtenerUsuarioId();
+            var cuenta = await _repositorioCuentas.ObtenerPorId(id, usuarioId);
+
+            if (cuenta is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            var modelo = new CuentaCreacionViewModel()
+            {
+             Id = cuenta.Id,
+             Nombre = cuenta.Nombre,
+             Descripcion = cuenta.Descripcion,
+             Balance = cuenta.Balance,
+             TipoCuentaId = cuenta.TipoCuentaId
+            };
+
+            modelo.TiposCuentas = await ObtenerTiposCuentas(usuarioId);
+
+            return View(modelo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Editar(CuentaCreacionViewModel cuentaEditar)
+        {
+            var usuarioId = _servicioUsuarios.ObtenerUsuarioId();
+            var cuenta = await _repositorioCuentas.ObtenerPorId(cuentaEditar.TipoCuentaId, usuarioId);
+
+            if (cuenta is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            var tiposCuenta = await _repositorioTiposCuentas.ObtenerPorId(cuentaEditar.TipoCuentaId, usuarioId);
+            if (tiposCuenta is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+
+            await _repositorioCuentas.Actualizar(cuentaEditar);
+            return RedirectToAction("Index");
+        }
+
     }
 }
