@@ -1,4 +1,6 @@
-﻿@model IEnumerable<IndiceCuentasViewModel>
+﻿@using System.Globalization
+
+@model IEnumerable<IndiceCuentasViewModel>
 
 @{
     ViewBag.Title = "Cuentas";
@@ -6,7 +8,8 @@
     string FormatearBalance(decimal balance)
     {
         // return balance.ToString("C");
-        return Math.Abs(balance).ToString("N");
+        //return Math.Abs(balance).ToString("C", new CultureInfo("es-ES"));
+        return balance.ToString("C", new CultureInfo("es-ES"));
     }
 
     string ObtenerClaseBalance(decimal balance)
@@ -77,9 +80,9 @@
                                         @cuenta.Nombre
                                     </strong>
                                     <a class="btn-primary btn" asp-action="Editar" asp-route-id="@cuenta.Id"><i class="bi-pencil-fill"></i></a>
-                                    <a class="btn-danger btn"><i class="bi-trash-fill"></i></a>
+                                    <a class="btn-danger btn" asp-action="Borrar" asp-route-id="@cuenta.Id"><i class="bi-trash-fill"></i></a>
                                 </span>
-                                <span>
+                                <span class="@claseCuenta">
                                     @FormatearBalance(cuenta.Balance)
                                 </span>
 

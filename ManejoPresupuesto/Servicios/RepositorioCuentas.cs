@@ -10,6 +10,7 @@ namespace ManejoPresupuesto.Servicios
         Task Actualizar(CuentaCreacionViewModel cuenta);
         Task<IEnumerable<Cuenta>> Buscar(int usuarioId);
         Task Crear(Cuenta cuenta);
+        Task Eliminar(int id);
         Task<Cuenta> ObtenerPorId(int id, int usuarioId);
     }
     public class RepositorioCuentas: IRepositorioCuentas
@@ -71,12 +72,16 @@ namespace ManejoPresupuesto.Servicios
         public async Task Actualizar(CuentaCreacionViewModel cuenta)
         {
             using var connection = new SqlConnection(connectionString);
-            //await connection.ExecuteAsync(@"update Cuentas set Nombre = @Nombre, Balance = @Balance, Descripcion = @Descripcion
-            //                                TipoCuentaId = @TipoCuentaId
-            //                                where Id = @Id", cuenta);
+
             await connection.ExecuteAsync(@"update Cuentas set Nombre = @Nombre, Balance = @Balance, Descripcion = @Descripcion,
                                     TipoCuentaId = @TipoCuentaId
                                     where Id = @Id", cuenta);
+        }
+
+        public async Task Eliminar(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.ExecuteAsync(@"delete from Cuentas where Id = @Id", new {id});
         }
     }
 }
