@@ -1,6 +1,7 @@
 ﻿using ManejoPresupuesto.Models;
 using ManejoPresupuesto.Servicios;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.InteropServices;
 
 namespace ManejoPresupuesto.Controllers
 {
@@ -50,6 +51,40 @@ namespace ManejoPresupuesto.Controllers
             var usuarioId = _servicioUsuarios.ObtenerUsuarioId();
             var categorias = await _repositorioCategorias.ObtenerCategoriasPorUsuario(usuarioId);
             return View(categorias);
-        }   
+        }
+        
+        public async Task<IActionResult> Editar(int id)
+        {
+            var usuarioId = _servicioUsuarios.ObtenerUsuarioId();
+            var categoria = await _repositorioCategorias.ObtenerCategoriaPorId(id, usuarioId);
+
+            if (categoria is null)
+            {
+                return RedirectToAction("NoEncontrado","Home");
+            }
+            return View(categoria);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Editar(Categoria categoriaEditar)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(categoriaEditar);
+            }
+
+            var usuarioId = _servicioUsuarios.ObtenerUsuarioId();
+            var categoria = await _repositorioCategorias.ObtenerCategoriaPorId(categoriaEditar.Id, usuarioId);
+            
+            if (categoria is null)
+            {
+                return RedirectToAction("NoEncontrado","Home");
+            }
+            
+            categoriaEditar.UsuarioId = usuarioId;
+
+            await _repositorioCategorias.Actualizar(categoriaEditar);
+            return RedirectToAction("Index");
+        }
     }
 }
