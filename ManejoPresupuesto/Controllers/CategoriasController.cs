@@ -34,7 +34,7 @@ namespace ManejoPresupuesto.Controllers
         [HttpPost]
         public async Task<IActionResult> Crear(Categoria categoria)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(categoria);
             }
