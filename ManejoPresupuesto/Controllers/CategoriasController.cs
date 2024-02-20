@@ -44,5 +44,12 @@ namespace ManejoPresupuesto.Controllers
             await _repositorioCategorias.Crear(categoria);
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Index()
+        {
+            var usuarioId = _servicioUsuarios.ObtenerUsuarioId();
+            var categorias = await _repositorioCategorias.ObtenerCategoriasPorUsuario(usuarioId);
+            return View(categorias);
+        }   
     }
 }
